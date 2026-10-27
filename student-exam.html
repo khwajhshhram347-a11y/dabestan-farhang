@@ -1,98 +1,88 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>آزمون آنلاین - دبستان فرهنگ</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-    body { background: #f1f5f9; color: #1e293b; padding: 20px; }
-    .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    h2 { color: #1e3a8a; margin-bottom: 15px; font-size: 20px; text-align: center; }
-    .login-box, .exam-box { margin-top: 20px; }
-    .exam-box { display: none; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #334155; }
-    input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-    .btn { display: inline-block; width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
-    .btn:hover { background: #1d4ed8; }
-    .question-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    .question-card p { font-weight: bold; margin-bottom: 15px; font-size: 15px; }
-    .options label { display: block; background: white; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-weight: normal; }
-    .options label:hover { background: #f1f5f9; }
-    .warning { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; font-weight: bold; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به آزمون - دبستان فرهنگ</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px; box-sizing: border-box; }
+        h2 { text-align: center; color: #1e293b; margin-bottom: 24px; font-size: 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; color: #475569; font-size: 14px; font-weight: 500; }
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Vazirmatn', sans-serif; font-size: 14px; box-sizing: border-box; }
+        input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        button { width: 100%; background: #4f46e5; color: white; border: none; padding: 14px; border-radius: 8px; font-family: 'Vazirmatn', sans-serif; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+        button:hover { background: #4338ca; }
+        .error-msg { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; text-align: center; display: none; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>سامانه آزمون آنلاین دبستان فرهنگ</h2>
-
-  <!-- فرم ورود با کد ۵ رقمی -->
-  <div id="loginBox" class="login-box">
-    <div class="form-group">
-      <label>نام و نام خانوادگی دانش‌آموز:</label>
-      <input type="text" id="studentName" placeholder="مثال: علی رضایی">
-    </div>
-    <div class="form-group">
-      <label>رمز عبور ۵ رقمی آزمون (دریافت شده از معلم):</label>
-      <input type="text" id="enteredPin" maxlength="5" placeholder="-----">
-    </div>
-    <button class="btn" onclick="startExam()">ورود به جلسه آزمون</button>
-  </div>
-
-  <!-- محیط سوالات آزمون -->
-  <div id="examBox" class="exam-box">
-    <div id="examHeader" style="margin-bottom: 20px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"></div>
+<div class="card">
+    <h2>سامانه آزمون آنلاین دبستان فرهنگ</h2>
+    <div id="errorBox" class="error-msg"></div>
     
-    <div class="question-card">
-      <p>۱. حاصل عبارت زیر در هوش کلامی کدام است؟</p>
-      <div class="options">
-        <label><input type="radio" name="q1" value="1"> الف) گزینه اول</label>
-        <label><input type="radio" name="q1" value="2"> ب) گزینه دوم</label>
-        <label><input type="radio" name="q1" value="3"> ج) گزینه سوم</label>
-        <label><input type="radio" name="q1" value="4"> د) گزینه چهارم</label>
-      </div>
+    <div class="form-group">
+        <label>نام و نام خانوادگی دانش‌آموز</label>
+        <input type="text" id="stuName" placeholder="مثال: علی رضایی">
+    </div>
+    
+    <div class="form-group">
+        <label>کد دانش‌آموزی (مثلاً 1 تا 4 رقم)</label>
+        <input type="text" id="stuId" placeholder="مثال: 1234">
     </div>
 
-    <button class="btn" onclick="submitExam()">ثبت نهایی و اتمام آزمون</button>
-    <div class="warning">⚠️ توجه: خروج از صفحه یا تعویض تب مرورگر به عنوان تقلب ثبت خواهد شد!</div>
-  </div>
+    <div class="form-group">
+        <label>پین کد آزمون</label>
+        <input type="text" id="stuPin" value="GAPGPTMASKTOKENaxa2scto8m7X0X" placeholder="پین ۵ رقمی">
+    </div>
 
+    <button onclick="startExam()">ورود به جلسه آزمون</button>
 </div>
 
+<script src="exam-engine.js"></script>
 <script>
-  function startExam() {
-    const name = document.getElementById('studentName').value;
-    const pin = document.getElementById('enteredPin').value;
-    const savedExam = JSON.parse(localStorage.getItem('currentExam'));
+    // مقداردهی پین پیش‌فرض در فیلد
+    document.getElementById('stuPin').value = "GAPGPTMASKTOKENaxa2scto8m7X1X";
 
-    if (!name) {
-      alert('لطفاً نام و نام خانوادگی خود را وارد کنید.');
-      return;
+    function startExam() {
+        const name = document.getElementById('stuName').value.trim();
+        const id = document.getElementById('stuId').value.trim();
+        const pin = document.getElementById('stuPin').value.trim();
+        const errorBox = document.getElementById('errorBox');
+
+        if (!name || !id || !pin) {
+            errorBox.textContent = "لطفاً نام، کد دانش‌آموزی و پین کد را وارد کنید.";
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        // بررسی آزمون در موتور سیستم
+        let exam = getExamByPin(pin);
+        if (!exam) {
+            errorBox.textContent = "آزمونی با این پین کد یافت نشد!";
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        // ذخیره اطلاعات دانش‌آموز در حافظه و ورود
+        const studentSession = {
+            studentId: id,
+            studentName: name,
+            grade: exam.grade || "6",
+            pin: pin,
+            examTitle: exam.title
+        };
+
+        registerStudentSession(studentSession);
+        localStorage.setItem('farhang_active_student', JSON.stringify(studentSession));
+        localStorage.setItem('farhang_active_exam', JSON.stringify(exam));
+
+        // هدایت به صفحه سوالات (یا پیام موفقیت)
+        alert("ورود با موفقیت انجام شد! آزمون آماده است.");
     }
-
-    if (!savedExam || pin !== savedExam.pin) {
-      alert('رمز عبور وارد شده نادرست است یا آزمونی فعال نشده است.');
-      return;
-    }
-
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('examBox').style.display = 'block';
-    document.getElementById('examHeader').innerText = `دانش‌آموز: ${name} | آزمون: ${savedExam.title}`;
-
-    // سیستم ضد تقلب (هشدار خروج از تب)
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        alert('هشدار: شما از صفحه آزمون خارج شدید! این مورد برای معلم گزارش می‌شود.');
-      }
-    });
-  }
-
-  function submitExam() {
-    alert('آزمون شما با موفقیت ثبت شد. خسته نباشید!');
-    window.location.href = 'index.html';
-  }
 </script>
 
 </body>
