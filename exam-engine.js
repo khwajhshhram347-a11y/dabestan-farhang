@@ -1,49 +1,32 @@
-/* ==========================================================
-   FARHANG EXAM ENGINE v2.3 - Fixed & Fallback Engine
-   دبستان فرهنگ - موتور آزمون با پشتیبانی ارقام فارسی و تست خودکار
-   ========================================================== */
+// ======================================================
+// موتور آزمون — دبستان فرهنگ
+// نسخه مقاوم: جست‌وجوی پین بدون خطای مقایسه
+// ======================================================
 
 const EXAMS_STORE_KEY = "farhang_exams_list";
-const SESSIONS_STORE_KEY = "farhang_live_sessions";
-const RETAKE_PERMISSIONS_KEY = "farhang_retake_permits";
 
-// --- تبدیل ارقام فارسی به انگلیسی ---
-function normalizePin(inputPin) {
-  if (!inputPin) return "";
-  const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
-  let englishPin = String(inputPin).trim();
-  for (let i = 0; i < 10; i++) {
-    englishPin = englishPin.replace(persianNumbers[i], i);
+// تبدیل ارقام فارسی/عربی به لاتین و پاک‌سازی فاصله‌ها
+function normalizePin(value) {
+  if (value === null || value === undefined) return "";
+  const persian = "۰۱۲۳۴۵۶۷۸۹";
+  const arabic  = "٠١٢٣٤٥٦٧٨٩";
+  let out = "";
+  const str = String(value).trim();
+  for (const ch of str) {
+    const p = persian.indexOf(ch);
+    const a = arabic.indexOf(ch);
+    if (p > -1) out += String(p);
+    else if (a > -1) out += String(a);
+    else out += ch;
   }
-  return englishPin.replace(/\D/g, ""); // فقط ارقام
+  return out.replace(/\s+/g, "");
 }
-
-// --- 1. مدیریت آزمون‌ها (Exams CRUD) ---
 
 function getAllExams() {
   try {
-    let exams = JSON.parse(localStorage.getItem(EXAMS_STORE_KEY));
-    if (!exams || !Array.isArray(exams) || exams.length === 0) {
-      // ایجاد آزمون پیش‌فرض اضطراری برای جلوگیری از خطای "یافت نشد"
-      const fallbackExam = {
-        id: "ex_default_test",
-        pin: "12345",
-        title: "آزمون تستی اضطراری پایه ۶ دبستان فرهنگ",
-        grade: 6,
-        category: "جامع",
-        difficulty: "استاندارد",
-        duration: 15,
-        startTime: "",
-        endTime: "",
-        questions: typeof getQuestionBank === "function" ? getQuestionBank().slice(0, 5) : [],
-        questionCount: 5,
-        status: "active",
-        createdAt: "سیستم"
-      };
-      localStorage.setItem(EXAMS_STORE_KEY, JSON.stringify([fallbackExam]));
-      return [fallbackExam];
-    }
-    return exams;
+    const raw = localStorage.getItem(EXAMS_STORE_KEY);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
     return [];
   }
@@ -58,26 +41,14 @@ function generateExamPin() {
 }
 
 function createMultiExam(config) {
-  const bank = typeof getQuestionBank === "function" ? getQuestionBank() : [];
-  
-  let pool = bank.filter(q => Number(q.grade) === Number(config.grade));
-  if (config.category && config.category !== "") {
-    pool = pool.filter(q => q.category === config.category);
-  }
-  if (config.difficulty && config.difficulty !== "") {
-    pool = pool.filter(q => q.difficulty === config.difficulty);
-  }
+  return createExam(config);
+}
 
-  if (config.shuffle) {
-    pool = [...pool].sort(() => Math.random() - 0.5);
-  }
-
-  const selectedQuestions = pool.slice(0, Number(config.count));
-  const pinCode = generateExamPin();
-
+function createExam(config) {
+  const selectedQuestions = pickQuestionsForExam(config);
   const newExam = {
     id: "ex_" + Date.now(),
-    pin: pinCode,
+    pin: generateExamPin(),
     title: config.title || `آزمون پایه ${config.grade} دبستان فرهنگ`,
     grade: Number(config.grade),
     category: config.category || "جامع",
@@ -88,7 +59,7 @@ function createMultiExam(config) {
     questions: selectedQuestions,
     questionCount: selectedQuestions.length,
     status: "active",
-    createdAt: new Date().toLocaleTimeString('fa-IR') + ' - ' + new Date().toLocaleDateString('fa-IR')
+    createdAt: new Date().toLocaleTimeString("fa-IR") + " - " + new Date().toLocaleDateString("fa-IR")
   };
 
   const exams = getAllExams();
@@ -97,170 +68,25 @@ function createMultiExam(config) {
   return newExam;
 }
 
+// جست‌وجوی مقاوم: بدون قید سخت‌گیرانه روی type و status
 function getExamByPin(pin) {
-  const cleanPin = normalizePin(pin);
+  const target = normalizePin(pin);
+  if (!target) return null;
+
   const exams = getAllExams();
-  return exams.find(e => normalizePin(e.pin) === cleanPin && e.status === "active");
+  const found = exams.find(e => normalizePin(e.pin) === target);
+
+  if (!found) return null;
+
+  // فقط آزمون‌های بسته یا حذف‌شده رد می‌شوند
+  const status = String(found.status || "active").trim().toLowerCase();
+  if (status === "closed" || status === "archived" || status === "deleted") return null;
+
+  return found;
 }
 
-function deleteExamById(examId) {
-  const exams = getAllExams().filter(e => e.id !== examId);
+function deleteExam(pin) {
+  const target = normalizePin(pin);
+  const exams = getAllExams().filter(e => normalizePin(e.pin) !== target);
   saveAllExams(exams);
-}
-
-function validateExamTiming(exam) {
-  if (!exam.startTime || !exam.endTime) return { valid: true };
-
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const [startH, startM] = exam.startTime.split(':').map(Number);
-  const [endH, endM] = exam.endTime.split(':').map(Number);
-
-  const startMinutes = startH * 60 + startM;
-  const endMinutes = endH * 60 + endM;
-
-  if (currentMinutes < startMinutes) {
-    return { valid: false, reason: `آزمون هنوز شروع نشده است. زمان آغاز: ${exam.startTime}` };
-  }
-
-  if (currentMinutes > endMinutes) {
-    return { valid: false, reason: `مهلت این آزمون به پایان رسیده است. زمان پایان: ${exam.endTime}` };
-  }
-
-  return { valid: true };
-}
-
-
-// --- 2. مدیریت نشست‌های زنده و امنیت ---
-
-function getLiveSessions() {
-  try {
-    return JSON.parse(localStorage.getItem(SESSIONS_STORE_KEY)) || [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveLiveSessions(sessions) {
-  localStorage.setItem(SESSIONS_STORE_KEY, JSON.stringify(sessions));
-}
-
-function getRetakeMap() {
-  try {
-    return JSON.parse(localStorage.getItem(RETAKE_PERMISSIONS_KEY)) || {};
-  } catch (e) {
-    return {};
-  }
-}
-
-function saveRetakeMap(map) {
-  localStorage.setItem(RETAKE_PERMISSIONS_KEY, JSON.stringify(map));
-}
-
-function checkStudentAccess(studentId, examPin) {
-  const sessions = getLiveSessions();
-  const permits = getRetakeMap();
-  const sessionKey = `${studentId}_${examPin}`;
-
-  const current = sessions.find(s => s.studentId === studentId && normalizePin(s.pin) === normalizePin(examPin));
-
-  if (!current) {
-    return { allowed: true };
-  }
-
-  if (current.status === "finished") {
-    return { allowed: false, reason: "شما این آزمون را قبلاً با موفقیت به پایان رسانده‌اید." };
-  }
-
-  if (current.status === "left" || current.status === "suspicious") {
-    if (permits[sessionKey] === true) {
-      return { allowed: true, isResume: true };
-    }
-    return {
-      allowed: false,
-      reason: "نشست شما به دلیل خروج از آزمون بسته شد. برای ورود مجدد نیاز به تایید مستقیم سرپرست در لایو مانیتور دارید."
-    };
-  }
-
-  return { allowed: true };
-}
-
-function registerStudentSession(student) {
-  let sessions = getLiveSessions();
-  const sessionKey = `${student.studentId}_${student.pin}`;
-  
-  const idx = sessions.findIndex(s => s.studentId === student.studentId && normalizePin(s.pin) === normalizePin(student.pin));
-
-  const sessionObj = {
-    studentId: student.studentId,
-    studentName: student.studentName,
-    grade: student.grade,
-    pin: normalizePin(student.pin),
-    examTitle: student.examTitle,
-    status: "online",
-    progress: 0,
-    warnings: 0,
-    startTime: new Date().toLocaleTimeString('fa-IR'),
-    lastPing: Date.now()
-  };
-
-  if (idx !== -1) {
-    sessions[idx] = { ...sessions[idx], status: "online", lastPing: Date.now() };
-  } else {
-    sessions.push(sessionObj);
-  }
-
-  saveLiveSessions(sessions);
-
-  const permits = getRetakeMap();
-  if (permits[sessionKey]) {
-    delete permits[sessionKey];
-    saveRetakeMap(permits);
-  }
-}
-
-function updateStudentProgress(studentId, examPin, answeredCount, totalCount) {
-  let sessions = getLiveSessions();
-  const s = sessions.find(item => item.studentId === studentId && normalizePin(item.pin) === normalizePin(examPin));
-  if (s) {
-    s.progress = Math.round((answeredCount / totalCount) * 100);
-    s.lastPing = Date.now();
-    saveLiveSessions(sessions);
-  }
-}
-
-function flagSuspiciousLeave(studentId, examPin) {
-  let sessions = getLiveSessions();
-  const s = sessions.find(item => item.studentId === studentId && normalizePin(item.pin) === normalizePin(examPin));
-  if (s && s.status !== "finished") {
-    s.status = "suspicious";
-    s.warnings = (s.warnings || 0) + 1;
-    s.lastLeaveTime = new Date().toLocaleTimeString('fa-IR');
-    saveLiveSessions(sessions);
-  }
-}
-
-function completeStudentSession(studentId, examPin) {
-  let sessions = getLiveSessions();
-  const s = sessions.find(item => item.studentId === studentId && normalizePin(item.pin) === normalizePin(examPin));
-  if (s) {
-    s.status = "finished";
-    s.progress = 100;
-    s.finishTime = new Date().toLocaleTimeString('fa-IR');
-    saveLiveSessions(sessions);
-  }
-}
-
-function grantTeacherRetake(studentId, pin) {
-  const map = getRetakeMap();
-  map[`${studentId}_${pin}`] = true;
-  saveRetakeMap(map);
-
-  let sessions = getLiveSessions();
-  const s = sessions.find(item => item.studentId === studentId && normalizePin(item.pin) === normalizePin(pin));
-  if (s) {
-    s.status = "online";
-    saveLiveSessions(sessions);
-  }
 }
