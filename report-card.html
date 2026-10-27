@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>کارنامه تحلیلی تیزهوشان | دبستان فرهنگ</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+
+  <style>
+    body { font-family: 'Vazirmatn', sans-serif; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; }
+      .print-card { box-shadow: none !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- سربرگ -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:justify-between md:items-center gap-4 print-card">
+      <div>
+        <h1 class="text-xl font-extrabold text-slate-800">کارنامه هوشمند شبیه‌ساز تیزهوشان</h1>
+        <p class="text-xs text-slate-500 mt-1">استان: سیستان و بلوچستان | سامانه هوشمند آزمون‌یار دبستان فرهنگ</p>
+        <p class="text-[11px] text-slate-400 mt-2" id="metaLine">—</p>
+      </div>
+      <div class="flex items-center gap-2 no-print">
+        <button id="printBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition">
+          چاپ کارنامه
+        </button>
+        <a href="index.html" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition">
+          خروج
+        </a>
+      </div>
+      <div class="text-left">
+        <span class="inline-block bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-extrabold" id="statusPill">تأیید شده</span>
+      </div>
+    </div>
+
+    <!-- پیام خطا/راهنما -->
+    <div id="guardBox" class="hidden bg-rose-50 border border-rose-200 text-rose-900 p-5 rounded-2xl print-card">
+      <div class="font-extrabold mb-2">کارنامه قابل نمایش نیست</div>
+      <div class="text-sm leading-7" id="guardText"></div>
+      <div class="mt-4 no-print">
+        <a href="index.html" class="inline-block bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition">
+          بازگشت
+        </a>
+      </div>
+    </div>
+
+    <!-- کارت‌های آمار -->
+    <div id="mainBox" class="space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-sm print-card">
+          <p class="text-xs text-slate-500 mb-1">درصد کل (با نمره منفی ۳-۱)</p>
+          <div class="text-3xl font-extrabold text-blue-600" id="percentBox">--٪</div>
+          <p class="text-[11px] text-slate-400 mt-1">محاسبه: (۳×درست − ۱×غلط) ÷ (۳×کل)</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-sm print-card">
+          <p class="text-xs text-slate-500 mb-1">تراز کشوری</p>
+          <div class="text-3xl font-extrabold text-indigo-600" id="tarazCountryBox">----</div>
+          <p class="text-xs text-slate-500 mt-1" id="rankCountryBox">رتبه کشوری: --</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-sm print-card">
+          <p class="text-xs text-slate-500 mb-1">تراز استانی</p>
+          <div class="text-3xl font-extrabold text-amber-600" id="tarazProvinceBox">----</div>
+          <p class="text-xs text-slate-500 mt-1" id="rankProvinceBox">رتبه استانی: --</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-sm print-card">
+          <p class="text-xs text-slate-500 mb-1">دقت پاسخ‌گویی</p>
+          <div class="text-3xl font-extrabold text-emerald-600" id="accuracyBox">--٪</div>
+          <p class="text-xs text-slate-500 mt-1" id="attemptBox">نرخ تلاش: --٪</p>
+        </div>
+      </div>
+
+      <!-- جزئیات پاسخ‌گویی -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-extrabold text-slate-800 text-sm">وضعیت پاسخ‌گویی</h3>
+          <div class="text-[11px] text-slate-400" id="qLine">—</div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-sm" id="detailsBox"></div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+          <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+            <div class="text-xs text-slate-500 mb-1">شاخص ریسک (غلط/پاسخ‌داده‌شده)</div>
+            <div class="font-extrabold text-slate-800" id="riskBox">--٪</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+            <div class="text-xs text-slate-500 mb-1">نرخ سفید</div>
+            <div class="font-extrabold text-slate-800" id="blankRateBox">--٪</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+            <div class="text-xs text-slate-500 mb-1">سطح عملکرد</div>
+            <div class="font-extrabold text-slate-800" id="levelTagBox">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- مشاوره دوگانه -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-card">
+          <h3 class="font-extrabold text-slate-800 text-sm mb-3">مشاوره هوشمند (کشوری)</h3>
+          <p class="text-sm leading-7 text-slate-700" id="advisorCountryText">—</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-card">
+          <h3 class="font-extrabold text-slate-800 text-sm mb-3">مشاوره هوشمند (استانی)</h3>
+          <p class="text-sm leading-7 text-slate-700" id="advisorProvinceText">—</p>
+        </div>
+      </div>
+
+      <!-- نکات کلیدی -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-card">
+        <h3 class="font-extrabold text-slate-800 text-sm mb-3">نکات کلیدی برای جهش تراز</h3>
+        <ul class="list-disc pr-5 space-y-2 text-sm leading-7 text-slate-700" id="tipsList"></ul>
+      </div>
+
+      <!-- برنامه 7 روزه -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-card">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <h3 class="font-extrabold text-slate-800 text-sm">برنامه ۷ روزه پیشنهادی</h3>
+          <span class="text-[11px] text-slate-400">قابل تنظیم توسط آموزگار</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="planBox"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="scoring.js"></script>
+  <script src="advisor.js"></script>
+
+  <script>
+    // 1) کنترل مجوز مشاهده کارنامه (طبق داشبورد)
+    const reportAllowed = localStorage.getItem("reportAllowed");
+    const guardBox = document.getElementById("guardBox");
+    const guardText = document.getElementById("guardText");
+    const mainBox = document.getElementById("mainBox");
+    const statusPill = document.getElementById("statusPill");
+
+    function showGuard(message) {
+      mainBox.classList.add("hidden");
+      guardBox.classList.remove("hidden");
+      guardText.innerText = message;
+      statusPill.innerText = "قفل شده";
+      statusPill.className = "inline-block bg-rose-100 text-rose-800 text-xs px-3 py-1 rounded-full font-extrabold";
+    }
+
+    if (reportAllowed !== "yes") {
+      showGuard("🔒 کارنامه هنوز توسط معلم منتشر نشده است. پس از فعال‌سازی مجوز در پنل مدیریت می‌توانید این صفحه را مشاهده کنید.");
+    } else {
+      statusPill.innerText = "تأیید شده";
+    }
+
+    // 2) دریافت داده از آزمون
+    const raw = localStorage.getItem("lastExamResults");
+    let results = null;
+
+    try { results = raw ? JSON.parse(raw) : null; } catch(e) { results = null; }
+
+    if (reportAllowed === "yes" && (!results || typeof results.totalQ === "undefined")) {
+      showGuard("⚠️ هیچ نتیجه‌ای برای نمایش پیدا نشد. ابتدا یک آزمون را تا پایان انجام دهید تا نتیجه در مرورگر ذخیره شود.");
+    }
+
+    // اگر گارد فعال شد، ادامه نده
+    if (guardBox.classList.contains("hidden") === false) {
+      // nothing
+    } else {
+      // 3) محاسبات
+      const metrics = calcTizhooshanMetrics(results);
+      const advisor = buildAdvisor(results, metrics);
+
+      // متادیتا
+      const now = new Date();
+      document.getElementById("metaLine").innerText =
+        "تاریخ ثبت: " + now.toLocaleDateString("fa-IR") + " | ساعت: " + now.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
+
+      document.getElementById("qLine").innerText = `کل سؤال: ${results.totalQ} | پاسخ‌داده‌شده: ${results.correct + results.wrong} | سفید: ${results.blank}`;
+
+      // 4) درج اعداد اصلی
+      document.getElementById("percentBox").innerText = metrics.percent + "٪";
+      document.getElementById("tarazCountryBox").innerText = metrics.country.taraz;
+      document.getElementById("rankCountryBox").innerText = "رتبه کشوری: " + metrics.country.rank;
+      document.getElementById("tarazProvinceBox").innerText = metrics.province.taraz;
+      document.getElementById("rankProvinceBox").innerText = "رتبه استانی: " + metrics.province.rank;
+
+      document.getElementById("accuracyBox").innerText = advisor.accuracy + "٪";
+      document.getElementById("attemptBox").innerText = "نرخ تلاش: " + advisor.attemptRate + "٪";
+
+      // 5) جزئیات
+      document.getElementById("detailsBox").innerHTML = `
+        <div class="bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-100 font-bold">✅ ${results.correct} درست</div>
+        <div class="bg-rose-50 text-rose-800 p-3 rounded-xl border border-rose-100 font-bold">❌ ${results.wrong} غلط</div>
+        <div class="bg-slate-50 text-slate-700 p-3 rounded-xl border border-slate-200 font-bold">⚪ ${results.blank} سفید</div>
+        <div class="bg-indigo-50 text-indigo-800 p-3 rounded-xl border border-indigo-100 font-bold">📊 ${results.totalQ} سؤال</div>
+      `;
+
+      document.getElementById("riskBox").innerText = advisor.riskIndex + "٪";
+      document.getElementById("blankRateBox").innerText = advisor.blankRate + "٪";
+      document.getElementById("levelTagBox").innerText = advisor.levelTag;
+
+      // 6) مشاوره
+      document.getElementById("advisorCountryText").innerText = advisor.dual.countryText;
+      document.getElementById("advisorProvinceText").innerText = advisor.dual.provinceText;
+
+      // 7) نکات کلیدی
+      const tipsList = document.getElementById("tipsList");
+      tipsList.innerHTML = "";
+      advisor.tips.forEach(t => {
+        const li = document.createElement("li");
+        li.innerText = t;
+        tipsList.appendChild(li);
+      });
+
+      // 8) برنامه 7 روزه
+      const planBox = document.getElementById("planBox");
+      planBox.innerHTML = "";
+      advisor.plan.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl";
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-extrabold text-slate-800">${item.day}</div>
+            <div class="text-xs text-slate-500 font-bold">${item.title}</div>
+          </div>
+          <ul class="list-disc pr-5 space-y-1 text-sm leading-7 text-slate-700">
+            ${item.tasks.map(x => `<li>${x}</li>`).join("")}
+          </ul>
+        `;
+        planBox.appendChild(card);
+      });
+
+      // 9) چاپ
+      document.getElementById("printBtn").addEventListener("click", () => window.print());
+    }
+  </script>
+</body>
+</html>

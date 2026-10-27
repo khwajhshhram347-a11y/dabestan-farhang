@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مدیریت آزمون‌های چندپایه | دبستان فرهنگ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+  <style> body { font-family: 'Vazirmatn', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-black text-slate-800">سامانه چند آزمونه دبستان فرهنگ</h1>
+        <p class="text-slate-500 text-sm mt-1">ساخت آزمون با زمان‌بندی دقیق شروع و پایان</p>
+      </div>
+      <div class="flex gap-2">
+        <a href="live-monitor.html" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 text-sm">
+          <span>📡 مانیتور زنده</span>
+        </a>
+        <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl font-bold transition text-sm">
+          داشبورد
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- فرم ساخت آزمون با زمان‌بندی -->
+      <div class="lg:col-span-1 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-fit space-y-4">
+        <h2 class="text-lg font-bold text-slate-800 border-b pb-3">⚡ ساخت آزمون زمان‌دار</h2>
+        <form id="createExamForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">عنوان آزمون</label>
+            <input id="examTitle" type="text" placeholder="مثال: آزمون جامع هوش" class="w-full border rounded-xl p-2.5 text-sm" required />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">پایه تحصیلی</label>
+              <select id="examGrade" class="w-full border rounded-xl p-2.5 text-sm">
+                <option value="1">پایه ۱</option>
+                <option value="2">پایه ۲</option>
+                <option value="3">پایه ۳</option>
+                <option value="4">پایه ۴</option>
+                <option value="5">پایه ۵</option>
+                <option value="6" selected>پایه ۶</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">تعداد سوال</label>
+              <input id="examCount" type="number" min="1" max="100" value="10" class="w-full border rounded-xl p-2.5 text-sm" required />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">ساعت شروع</label>
+              <input id="examStartTime" type="time" class="w-full border rounded-xl p-2.5 text-sm" required />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">ساعت پایان</label>
+              <input id="examEndTime" type="time" class="w-full border rounded-xl p-2.5 text-sm" required />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">مبحث / درس</label>
+            <select id="examCategory" class="w-full border rounded-xl p-2.5 text-sm">
+              <option value="">همه درس‌ها</option>
+              <option value="ریاضی">ریاضی</option>
+              <option value="هوش تحلیلی">هوش تحلیلی</option>
+              <option value="فارسی">فارسی</option>
+              <option value="علوم">علوم</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input id="examShuffle" type="checkbox" checked class="rounded w-4 h-4 text-slate-800" />
+            <label for="examShuffle" class="text-xs text-slate-600 font-bold">چینش تصادفی سوالات</label>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-sm">
+            تولید آزمون و پین‌کد
+          </button>
+        </form>
+      </div>
+
+      <!-- لیست آزمون‌ها -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 border-b pb-3">📋 آزمون‌های فعال و زمان‌بندی‌شده</h2>
+          <div id="activeExamsList" class="divide-y divide-slate-100 mt-2"></div>
+        </div>
+
+        <!-- افزودن سوال به بانک -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <details class="cursor-pointer">
+            <summary class="font-bold text-slate-700 hover:text-slate-900 transition flex justify-between items-center text-sm">
+              <span>➕ افزودن سوال جدید به بانک سوالات مدرسه</span>
+              <span class="text-xs bg-slate-100 px-2 py-1 rounded">کلیک کنید</span>
+            </summary>
+            
+            <form id="newQuestionForm" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">پایه</label>
+                <select id="qGrade" class="w-full border rounded-xl p-2.5">
+                  <option value="1">پایه اول</option>
+                  <option value="2">پایه دوم</option>
+                  <option value="3">پایه سوم</option>
+                  <option value="4">پایه چهارم</option>
+                  <option value="5">پایه پنجم</option>
+                  <option value="6" selected>پایه ششم</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">مبحث</label>
+                <input id="qCat" type="text" placeholder="ریاضی، هوش..." class="w-full border rounded-xl p-2.5" required />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">صورت سوال</label>
+                <textarea id="qText" rows="2" class="w-full border rounded-xl p-2.5" required></textarea>
+              </div>
+              <div><input id="qA" placeholder="گزینه A" class="w-full border rounded-xl p-2" required /></div>
+              <div><input id="qB" placeholder="گزینه B" class="w-full border rounded-xl p-2" required /></div>
+              <div><input id="qC" placeholder="گزینه C" class="w-full border rounded-xl p-2" required /></div>
+              <div><input id="qD" placeholder="گزینه D" class="w-full border rounded-xl p-2" required /></div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">گزینه درست</label>
+                <select id="qAns" class="w-full border rounded-xl p-2">
+                  <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button type="submit" class="w-full bg-slate-800 text-white font-bold p-2.5 rounded-xl">ذخیره سوال</button>
+              </div>
+            </form>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="question-bank.js"></script>
+  <script src="exam-engine.js"></script>
+  <script>
+    if (typeof seedSampleQuestions === "function") seedSampleQuestions();
+
+    function renderActiveExams() {
+      const list = getAllExams();
+      const container = document.getElementById("activeExamsList");
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">هیچ آزمونی ایجاد نشده است.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(ex => `
+        <div class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-800 text-base">${ex.title}</span>
+              <span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-md font-bold">پایه ${ex.grade}</span>
+            </div>
+            <div class="text-xs text-slate-500">
+              سوالات: ${ex.questionCount} | شروع: ${ex.startTime || 'آزاد'} تا پایان: ${ex.endTime || 'آزاد'}
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="bg-amber-100 border border-amber-300 text-amber-900 px-3 py-1.5 rounded-xl text-center">
+              <div class="text-[10px] font-bold uppercase text-amber-700">پین کد</div>
+              <div class="text-xl font-black font-mono tracking-widest">${ex.pin}</div>
+            </div>
+            <button onclick="removeExam('${ex.id}')" class="text-rose-500 hover:text-rose-700 text-sm font-semibold p-2">حذف</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function removeExam(id) {
+      if (confirm("آیا این آزمون حذف شود؟")) {
+        deleteExamById(id);
+        renderActiveExams();
+      }
+    }
+
+    document.getElementById("createExamForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const exam = createMultiExam({
+        title: document.getElementById("examTitle").value,
+        grade: document.getElementById("examGrade").value,
+        count: document.getElementById("examCount").value,
+        startTime: document.getElementById("examStartTime").value,
+        endTime: document.getElementById("examEndTime").value,
+        category: document.getElementById("examCategory").value,
+        shuffle: document.getElementById("examShuffle").checked
+      });
+
+      if (exam.questionCount === 0) {
+        alert("برای این پایه سوالی در بانک موجود نیست!");
+      } else {
+        alert(`آزمون زمان‌دار ایجاد شد!\nپین کد: ${exam.pin}`);
+      }
+      this.reset();
+      renderActiveExams();
+    });
+
+    document.getElementById("newQuestionForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      addQuestion({
+        grade: document.getElementById("qGrade").value,
+        category: document.getElementById("qCat").value,
+        difficulty: "medium",
+        question: document.getElementById("qText").value,
+        choiceA: document.getElementById("qA").value,
+        choiceB: document.getElementById("qB").value,
+        choiceC: document.getElementById("qC").value,
+        choiceD: document.getElementById("qD").value,
+        answer: document.getElementById("qAns").value
+      });
+      alert("سوال اضافه شد.");
+      this.reset();
+    });
+
+    renderActiveExams();
+  </script>
+</body>
+</html>

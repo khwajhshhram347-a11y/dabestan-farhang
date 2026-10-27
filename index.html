@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود معلم | دبستان فرهنگ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; }
+    </style>
+</head>
+<body class="bg-indigo-950 text-white min-h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="text-center mb-8">
+        <span class="text-5xl">🏫</span>
+        <h1 class="text-2xl font-black mt-3">دبستان فرهنگ</h1>
+        <p class="text-indigo-300 text-sm mt-1">ورود به پنل معلمان</p>
+    </div>
+
+    <div class="bg-white text-slate-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+        <h2 class="text-lg font-bold text-center mb-6">ورود همکار گرامی</h2>
+
+        <label class="block text-sm mb-2">نام کاربری معلم</label>
+        <input id="username" type="text" placeholder="مثلاً: sarparast"
+            class="w-full border border-slate-300 rounded-lg px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+        <label class="block text-sm mb-2">کد ورود</label>
+        <input id="password" type="password" placeholder="کد چهار رقمی"
+            class="w-full border border-slate-300 rounded-lg px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+        <button onclick="login()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition active:scale-95">
+            ورود به پنل
+        </button>
+
+        <p id="msg" class="text-red-600 text-sm text-center mt-4 hidden"></p>
+    </div>
+
+    <script>
+        // نام کاربری و کد ورود پیش‌فرض (موقت)
+        const validUser = "sarparast";
+        const validPass = "1234";
+
+        function login() {
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+            const msg = document.getElementById("msg");
+
+            if (user === validUser && pass === validPass) {
+                msg.classList.add("hidden");
+                alert("✅ خوش آمدید! وارد پنل معلمان شدید.");
+            } else {
+                msg.textContent = "نام کاربری یا کد ورود اشتباه است.";
+                msg.classList.remove("hidden");
+            }
+        }
+    </script>
+
+</body>
+</html>
