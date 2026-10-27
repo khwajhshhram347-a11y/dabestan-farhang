@@ -1,60 +1,63 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ورود معلم | دبستان فرهنگ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <style>
-        body { font-family: 'Vazirmatn', sans-serif; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه آزمون‌یار دبستان فرهنگ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+    body { background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; padding: 30px; text-align: center; }
+    h2 { color: #1e3a8a; margin-bottom: 10px; font-size: 20px; }
+    p { color: #64748b; font-size: 13px; margin-bottom: 25px; }
+    .form-group { margin-bottom: 15px; text-align: right; }
+    label { display: block; margin-bottom: 6px; font-size: 13px; color: #334155; font-weight: bold; }
+    input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus { border-color: #2563eb; ring: 2px solid #bfdbfe; }
+    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    button:hover { background: #1d4ed8; }
+    .error { color: #ef4444; font-size: 12px; margin-top: 10px; display: none; }
+    .student-link { margin-top: 20px; font-size: 13px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+    .student-link a { color: #059669; text-decoration: none; font-weight: bold; }
+  </style>
 </head>
-<body class="bg-indigo-950 text-white min-h-screen flex flex-col items-center justify-center p-6">
+<body>
 
-    <div class="text-center mb-8">
-        <span class="text-5xl">🏫</span>
-        <h1 class="text-2xl font-black mt-3">دبستان فرهنگ</h1>
-        <p class="text-indigo-300 text-sm mt-1">ورود به پنل معلمان</p>
+<div class="card">
+  <h2>سامانه آزمون‌یار دبستان فرهنگ</h2>
+  <p>ورود آموزگاران و مدیریت آزمون</p>
+
+  <form id="loginForm">
+    <div class="form-group">
+      <label>نام کاربری:</label>
+      <input type="text" id="username" placeholder="sarparast" required>
     </div>
-
-    <div class="bg-white text-slate-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
-        <h2 class="text-lg font-bold text-center mb-6">ورود همکار گرامی</h2>
-
-        <label class="block text-sm mb-2">نام کاربری معلم</label>
-        <input id="username" type="text" placeholder="مثلاً: sarparast"
-            class="w-full border border-slate-300 rounded-lg px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-
-        <label class="block text-sm mb-2">کد ورود</label>
-        <input id="password" type="password" placeholder="کد چهار رقمی"
-            class="w-full border border-slate-300 rounded-lg px-4 py-2.5 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-
-        <button onclick="login()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition active:scale-95">
-            ورود به پنل
-        </button>
-
-        <p id="msg" class="text-red-600 text-sm text-center mt-4 hidden"></p>
+    <div class="form-group">
+      <label>رمز عبور:</label>
+      <input type="password" id="password" placeholder="••••" required>
     </div>
+    <button type="submit">ورود به پنل آموزگار</button>
+    <div id="errorMsg" class="error">نام کاربری یا رمز عبور اشتباه است!</div>
+  </form>
 
-    <script>
-        // نام کاربری و کد ورود پیش‌فرض (موقت)
-        const validUser = "sarparast";
-        const validPass = "1234";
+  <div class="student-link">
+    دانش‌آموز هستید؟ <a href="student-exam.html">ورود به صفحه آزمون دانش‌آموز</a>
+  </div>
+</div>
 
-        function login() {
-            const user = document.getElementById("username").value;
-            const pass = document.getElementById("password").value;
-            const msg = document.getElementById("msg");
-
-            if (user === validUser && pass === validPass) {
-                msg.classList.add("hidden");
-                alert("✅ خوش آمدید! وارد پنل معلمان شدید.");
-            } else {
-                msg.textContent = "نام کاربری یا کد ورود اشتباه است.";
-                msg.classList.remove("hidden");
-            }
-        }
-    </script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    
+    if (u === 'sarparast' && p === '1234') {
+      window.location.href = 'dashboard.html';
+    } else {
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+  });
+</script>
 
 </body>
 </html>
