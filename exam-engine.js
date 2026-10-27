@@ -1,13 +1,12 @@
 /* ==========================================================
-   FARHANG EXAM ENGINE v2.4 - دبستان فرهنگ
-   نسخه نهایی با رفع مشکل عدم شناسایی پین‌کد
+   FARHANG EXAM ENGINE - نسخه جامع نهایی
+   دبستان فرهنگ - مدیریت آزمون‌ها و نشست‌های زنده
    ========================================================== */
 
 const EXAMS_STORE_KEY = "farhang_exams_list";
 const SESSIONS_STORE_KEY = "farhang_live_sessions";
 const RETAKE_PERMISSIONS_KEY = "farhang_retake_permits";
 
-// تبدیل ارقام فارسی و عربی به انگلیسی
 function normalizePin(inputPin) {
   if (inputPin === null || inputPin === undefined) return "";
   let val = String(inputPin).trim();
@@ -19,7 +18,6 @@ function normalizePin(inputPin) {
   return val.toLowerCase();
 }
 
-// خواندن آزمون‌ها
 function getAllExams() {
   try {
     let exams = JSON.parse(localStorage.getItem(EXAMS_STORE_KEY));
@@ -27,7 +25,7 @@ function getAllExams() {
       const fallbackExam = {
         id: "ex_default_test",
         pin: "12345",
-        title: "آزمون تستی دبستان فرهنگ",
+        title: "آزمون تستی پیش‌فرض تیزهوشان",
         grade: 6,
         category: "جامع",
         difficulty: "استاندارد",
@@ -59,8 +57,8 @@ function generateExamPin() {
 function createMultiExam(config) {
   const bank = typeof getQuestionBank === "function" ? getQuestionBank() : [];
   let pool = bank.filter(q => Number(q.grade) === Number(config.grade));
-  if (config.category) pool = pool.filter(q => q.category === config.category);
-  if (config.difficulty) pool = pool.filter(q => q.difficulty === config.difficulty);
+  if (config.category && config.category !== "") pool = pool.filter(q => q.category === config.category);
+  if (config.difficulty && config.difficulty !== "") pool = pool.filter(q => q.difficulty === config.difficulty);
   if (config.shuffle) pool = [...pool].sort(() => Math.random() - 0.5);
 
   const selectedQuestions = pool.slice(0, Number(config.count));
@@ -88,11 +86,10 @@ function createMultiExam(config) {
   return newExam;
 }
 
-// پیدا کردن آزمون بر اساس پین
 function getExamByPin(pin) {
   const cleanPin = normalizePin(pin);
   const exams = getAllExams();
-  return exams.find(e => normalizePin(e.pin) === cleanPin);
+  return exams.find(e => normalizePin(e.pin) === cleanPin && e.status === "active");
 }
 
 function deleteExamById(examId) {
@@ -101,17 +98,24 @@ function deleteExamById(examId) {
 }
 
 function validateExamTiming(exam) {
-  return { valid: true }; // برای جلوگیری از خطای زمان آزمون
+  return { valid: true };
 }
 
 function getLiveSessions() {
   try { return JSON.parse(localStorage.getItem(SESSIONS_STORE_KEY)) || []; } catch (e) { return []; }
 }
-function saveLiveSessions(s) { localStorage.setItem(SESSIONS_STORE_KEY, JSON.stringify(s)); }
+
+function saveLiveSessions(sessions) {
+  localStorage.setItem(SESSIONS_STORE_KEY, JSON.stringify(sessions));
+}
+
 function getRetakeMap() {
   try { return JSON.parse(localStorage.getItem(RETAKE_PERMISSIONS_KEY)) || {}; } catch (e) { return {}; }
 }
-function saveRetakeMap(m) { localStorage.setItem(RETAKE_PERMISSIONS_KEY, JSON.stringify(m)); }
+
+function saveRetakeMap(map) {
+  localStorage.setItem(RETAKE_PERMISSIONS_KEY, JSON.stringify(map));
+}
 
 function checkStudentAccess(studentId, examPin) {
   return { allowed: true };
@@ -119,6 +123,8 @@ function checkStudentAccess(studentId, examPin) {
 
 function registerStudentSession(student) {
   let sessions = getLiveSessions();
+  const idx = sessions.findIndex(s => s.studentId === student.studentId && normalizePin(s.pin) === normalizePin(student.pin));
+
   const sessionObj = {
     studentId: student.studentId,
     studentName: student.studentName,
@@ -131,7 +137,13 @@ function registerStudentSession(student) {
     startTime: new Date().toLocaleTimeString('fa-IR'),
     lastPing: Date.now()
   };
-  sessions.push(sessionObj);
+
+  if (idx !== -1) {
+    sessions[idx] = { ...sessions[idx], status: "online", lastPing: Date.now() };
+  } else {
+    sessions.push(sessionObj);
+  }
+
   saveLiveSessions(sessions);
 }
 
