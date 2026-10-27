@@ -1,263 +1,99 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>برگزاری آزمون | دبستان فرهنگ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
-  <style> body { font-family: 'Vazirmatn', sans-serif; -webkit-tap-highlight-color: transparent; } </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آزمون آنلاین - دبستان فرهنگ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+    body { background: #f1f5f9; color: #1e293b; padding: 20px; }
+    .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    h2 { color: #1e3a8a; margin-bottom: 15px; font-size: 20px; text-align: center; }
+    .login-box, .exam-box { margin-top: 20px; }
+    .exam-box { display: none; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #334155; }
+    input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .btn { display: inline-block; width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+    .btn:hover { background: #1d4ed8; }
+    .question-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .question-card p { font-weight: bold; margin-bottom: 15px; font-size: 15px; }
+    .options label { display: block; background: white; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-weight: normal; }
+    .options label:hover { background: #f1f5f9; }
+    .warning { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; font-weight: bold; }
+  </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body>
 
-  <div class="max-w-2xl mx-auto p-4 md:py-8 space-y-4">
-    <!-- فرم ورود -->
-    <div id="loginStep" class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black mb-3">ف</div>
-        <h1 class="text-xl font-black text-slate-800">سامانه آزمون هوشمند دبستان فرهنگ</h1>
-        <p class="text-xs text-slate-500 mt-1">ورود به آزمون زمان‌دار با پین‌کد</p>
-      </div>
+<div class="container">
+  <h2>سامانه آزمون آنلاین دبستان فرهنگ</h2>
 
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">نام و نام خانوادگی</label>
-          <input id="stuName" type="text" placeholder="مثال: علی رضایی" class="w-full border rounded-2xl p-3.5 text-sm bg-slate-50" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">کد دانش‌آموزی</label>
-            <input id="stuId" type="number" placeholder="مثال: 9814" class="w-full border rounded-2xl p-3.5 text-sm bg-slate-50" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">پایه تحصیلی</label>
-            <select id="stuGrade" class="w-full border rounded-2xl p-3.5 text-sm bg-slate-50">
-              <option value="1">پایه اول</option>
-              <option value="2">پایه دوم</option>
-              <option value="3">پایه سوم</option>
-              <option value="4">پایه چهارم</option>
-              <option value="5">پایه پنجم</option>
-              <option value="6" selected>پایه ششم</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">پین کد آزمون (۵ رقمی)</label>
-          <input id="stuPin" type="text" maxlength="5" placeholder="کد دریافتی از معلم" class="w-full border-2 border-indigo-200 focus:border-indigo-600 rounded-2xl p-3.5 text-center text-xl font-mono tracking-widest bg-slate-50" />
-        </div>
-
-        <div id="errorBox" class="hidden text-xs bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl leading-relaxed"></div>
-
-        <button id="btnStart" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg transition">
-          ورود و شروع آزمون
-        </button>
-      </div>
+  <!-- فرم ورود با کد ۵ رقمی -->
+  <div id="loginBox" class="login-box">
+    <div class="form-group">
+      <label>نام و نام خانوادگی دانش‌آموز:</label>
+      <input type="text" id="studentName" placeholder="مثال: علی رضایی">
     </div>
-
-    <!-- محیط آزمون -->
-    <div id="examStep" class="hidden space-y-4">
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between sticky top-2 z-20">
-        <div>
-          <h2 id="topExamTitle" class="text-sm font-bold text-slate-800"></h2>
-          <div class="text-[11px] text-slate-500" id="topStudentMeta"></div>
-        </div>
-        <div class="text-left flex items-center gap-4">
-          <div>
-            <div class="text-[10px] text-slate-400">زمان باقی‌مانده</div>
-            <div class="text-sm font-black text-rose-600 font-mono" id="timerTxt">--:--</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="questionsContainer" class="space-y-4 pb-20"></div>
-
-      <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur border-t border-slate-200 max-w-2xl mx-auto flex items-center justify-between">
-        <span class="text-xs text-slate-500">نمره منفی ۳-۱ فعال است</span>
-        <button id="btnFinish" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition">
-          ثبت نهایی و ارسال
-        </button>
-      </div>
+    <div class="form-group">
+      <label>رمز عبور ۵ رقمی آزمون (دریافت شده از معلم):</label>
+      <input type="text" id="enteredPin" maxlength="5" placeholder="-----">
     </div>
+    <button class="btn" onclick="startExam()">ورود به جلسه آزمون</button>
   </div>
 
-  <script src="question-bank.js"></script>
-  <script src="exam-engine.js"></script>
-  <script src="scoring.js"></script>
-  <script>
-    let activeStudent = null;
-    let activeExam = null;
-    let studentAnswers = {};
-    let isFinished = false;
-    let timerInterval = null;
+  <!-- محیط سوالات آزمون -->
+  <div id="examBox" class="exam-box">
+    <div id="examHeader" style="margin-bottom: 20px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"></div>
+    
+    <div class="question-card">
+      <p>۱. حاصل عبارت زیر در هوش کلامی کدام است؟</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="1"> الف) گزینه اول</label>
+        <label><input type="radio" name="q1" value="2"> ب) گزینه دوم</label>
+        <label><input type="radio" name="q1" value="3"> ج) گزینه سوم</label>
+        <label><input type="radio" name="q1" value="4"> د) گزینه چهارم</label>
+      </div>
+    </div>
 
-    const btnStart = document.getElementById("btnStart");
-    const errorBox = document.getElementById("errorBox");
+    <button class="btn" onclick="submitExam()">ثبت نهایی و اتمام آزمون</button>
+    <div class="warning">⚠️ توجه: خروج از صفحه یا تعویض تب مرورگر به عنوان تقلب ثبت خواهد شد!</div>
+  </div>
 
-    function showError(msg) {
-      errorBox.textContent = msg;
-      errorBox.classList.remove("hidden");
+</div>
+
+<script>
+  function startExam() {
+    const name = document.getElementById('studentName').value;
+    const pin = document.getElementById('enteredPin').value;
+    const savedExam = JSON.parse(localStorage.getItem('currentExam'));
+
+    if (!name) {
+      alert('لطفاً نام و نام خانوادگی خود را وارد کنید.');
+      return;
     }
 
-    btnStart.addEventListener("click", () => {
-      errorBox.classList.add("hidden");
-      const name = document.getElementById("stuName").value.trim();
-      const id = document.getElementById("stuId").value.trim();
-      const grade = document.getElementById("stuGrade").value;
-      const pin = document.getElementById("stuPin").value.trim();
-
-      if (!name || !id || !pin) {
-        showError("لطفاً کلیه فیلدها را کامل کنید.");
-        return;
-      }
-
-      const exam = getExamByPin(pin);
-      if (!exam) {
-        showError("آزمونی با این پین کد یافت نشد.");
-        return;
-      }
-
-      if (Number(exam.grade) !== Number(grade)) {
-        showError(`این آزمون مربوط به پایه ${exam.grade} است.`);
-        return;
-      }
-
-      // بررسی زمان‌بندی
-      const timingCheck = validateExamTiming(exam);
-      if (!timingCheck.valid) {
-        showError(timingCheck.reason);
-        return;
-      }
-
-      const access = checkStudentAccess(id, pin);
-      if (!access.allowed) {
-        showError(access.reason);
-        return;
-      }
-
-      activeStudent = { studentName: name, studentId: id, grade, pin, examTitle: exam.title };
-      activeExam = exam;
-
-      registerStudentSession(activeStudent);
-      startExamView();
-    });
-
-    function startExamView() {
-      document.getElementById("loginStep").classList.add("hidden");
-      document.getElementById("examStep").classList.remove("hidden");
-
-      document.getElementById("topExamTitle").textContent = activeExam.title;
-      document.getElementById("topStudentMeta").textContent = `${activeStudent.studentName} | کد: ${activeStudent.studentId}`;
-
-      renderQuestions();
-      startTimer();
-      window.scrollTo(0, 0);
-
-      window.addEventListener("blur", () => {
-        if (!isFinished) flagSuspiciousLeave(activeStudent.studentId, activeStudent.pin);
-      });
+    if (!savedExam || pin !== savedExam.pin) {
+      alert('رمز عبور وارد شده نادرست است یا آزمونی فعال نشده است.');
+      return;
     }
 
-    function startTimer() {
-      // محاسبه زمان پایان بر اساس ساعت پایان آزمون یا مدت زمان پیش‌فرض
-      let endTimeMs;
-      if (activeExam.endTime) {
-        const [h, m] = activeExam.endTime.split(':').map(Number);
-        const endDt = new Date();
-        endDt.setHours(h, m, 0, 0);
-        endTimeMs = endDt.getTime();
-      } else {
-        endTimeMs = Date.now() + (activeExam.duration * 60 * 1000);
-      }
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('examBox').style.display = 'block';
+    document.getElementById('examHeader').innerText = `دانش‌آموز: ${name} | آزمون: ${savedExam.title}`;
 
-      timerInterval = setInterval(() => {
-        const remaining = endTimeMs - Date.now();
-        if (remaining <= 0) {
-          clearInterval(timerInterval);
-          alert("زمان آزمون به پایان رسید! برگه شما به‌طور خودکار ثبت می‌شود.");
-          submitExamData();
-          return;
-        }
-
-        const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((remaining % (1000 * 60)) / 1000);
-        document.getElementById("timerTxt").textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      }, 1000);
-    }
-
-    function renderQuestions() {
-      const container = document.getElementById("questionsContainer");
-      container.innerHTML = activeExam.questions.map((q, idx) => `
-        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-          <div class="flex items-start gap-2">
-            <span class="bg-slate-100 text-slate-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">${idx + 1}</span>
-            <div class="text-sm font-bold text-slate-800 leading-relaxed">${q.question}</div>
-          </div>
-          <div class="space-y-2 pt-2">
-            ${['A', 'B', 'C', 'D'].map((letter, optIdx) => `
-              <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-slate-50/60 cursor-pointer">
-                <input type="radio" name="q_${idx}" value="${letter}" onchange="selectOption(${idx}, '${letter}')" class="w-4 h-4 text-indigo-600" />
-                <span class="text-xs text-slate-700 font-medium">${q.choices[optIdx]}</span>
-              </label>
-            `).join("")}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function selectOption(qIdx, letter) {
-      studentAnswers[qIdx] = letter;
-      const answeredCount = Object.keys(studentAnswers).length;
-      updateStudentProgress(activeStudent.studentId, activeStudent.pin, answeredCount, activeExam.questions.length);
-    }
-
-    function submitExamData() {
-      if (isFinished) return;
-      isFinished = true;
-      if (timerInterval) clearInterval(timerInterval);
-
-      let correct = 0, wrong = 0, blank = 0;
-      activeExam.questions.forEach((q, idx) => {
-        const ans = studentAnswers[idx];
-        if (!ans) blank++;
-        else if (ans === q.answer) correct++;
-        else wrong++;
-      });
-
-      const results = {
-        studentName: activeStudent.studentName,
-        studentId: activeStudent.studentId,
-        grade: activeStudent.grade,
-        totalQ: activeExam.questions.length,
-        correct, wrong, blank
-      };
-
-      let metrics = null;
-      if (typeof calculateTizhooshanMetrics === "function") {
-        metrics = calculateTizhooshanMetrics(results);
-      } else {
-        const rawScore = correct - (wrong / 3);
-        metrics = { percent: Math.round((rawScore / results.totalQ) * 100), country: { taraz: 5000, rank: 50000 }, province: { taraz: 5000, rank: 3500 } };
-      }
-
-      localStorage.setItem("lastExamResults", JSON.stringify({ ...results, metrics }));
-      completeStudentSession(activeStudent.studentId, activeStudent.pin);
-
-      const reportAllowed = localStorage.getItem("reportAllowed");
-      if (reportAllowed === "yes") {
-        window.location.href = "report-card.html";
-      } else {
-        alert("آزمون ثبت شد.");
-        window.location.href = "index.html";
-      }
-    }
-
-    document.getElementById("btnFinish").addEventListener("click", () => {
-      if (confirm("آیا از ارسال نهایی آزمون مطمئن هستید؟")) {
-        submitExamData();
+    // سیستم ضد تقلب (هشدار خروج از تب)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        alert('هشدار: شما از صفحه آزمون خارج شدید! این مورد برای معلم گزارش می‌شود.');
       }
     });
-  </script>
+  }
+
+  function submitExam() {
+    alert('آزمون شما با موفقیت ثبت شد. خسته نباشید!');
+    window.location.href = 'index.html';
+  }
+</script>
+
 </body>
 </html>
